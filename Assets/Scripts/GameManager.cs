@@ -1,7 +1,7 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using Unity.VisualScripting;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
 
     public Button nextLevelButton;
     public Button restartLevelButton;
+    
 
     [Header("Radius Limits")]
     public float minRadius = 1f;
@@ -32,12 +33,14 @@ public class GameManager : MonoBehaviour
     float minPlayableRadius;
     float maxPlayableRadius;
 
+    private PlayerInputActions inputActions;
+
     void Start()
     {
         resultText = ResultTextObject.GetComponentInChildren<TMP_Text>();
         totalScoreText.text = $"Total Score:0";
 
-        
+
         nextLevelButton.gameObject.SetActive(false);
         restartLevelButton.gameObject.SetActive(false);
 
@@ -50,6 +53,15 @@ public class GameManager : MonoBehaviour
 
         StartNewLevel();
     }
+
+    private void Awake()
+    {
+        inputActions = new PlayerInputActions();
+        inputActions.UI.Quit.performed += _ => Quit();
+    }
+
+    void OnEnable() => inputActions.Enable();
+    void OnDisable() => inputActions.Disable();
 
     public void StartNewLevel()
     {
@@ -128,7 +140,7 @@ public class GameManager : MonoBehaviour
 
     public void LevelFailed()
     {
-        
+
         ResultTextObject.SetActive(true);
         resultText.color = Color.red;
         resultText.text = "FAILED!";
@@ -147,4 +159,13 @@ public class GameManager : MonoBehaviour
     {
         highScoreText.text = $"High Score: {highScore}"; //update high score text in UI
     }
+
+    public void Quit()
+    {
+        Debug.Log("Quitting Game");
+
+        Application.Quit();
+
+    }
+
 }
